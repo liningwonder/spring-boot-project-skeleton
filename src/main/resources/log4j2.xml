@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss:SSS} [%p] [%X{REQUEST_ID}] [%C.%M.%L] [%t] : %m %n"/>
+        </Console>
+        <RollingFile name="RollingFile" fileName="./logs/app.log" filePattern="./logs/app_%d{yyyy-MM-dd}_%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss:SSS} [%p] [%X{REQUEST_ID}] [%C.%M.%L] [%t] : %m %n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="24"/>
+                <SizeBasedTriggeringPolicy size="500 MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="druidSqlRollingFile" fileName="./logs/druid-sql.log"
+                     filePattern="logs/$${date:yyyy-MM}/api-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] %-5level [%X{REQUEST_ID}] %L %M - %msg%xEx%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="500 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+        <logger name="com.datafusion.iam" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+            <appender-ref ref="RollingFile"/>
+        </logger>
+
+        <!--记录druid-sql的记录-->
+        <logger name="druid.sql.Statement" level="warn" additivity="false">
+            <appender-ref ref="druidSqlRollingFile"/>
+        </logger>
+
+        <logger name="druid.sql.Statement" level="warn" additivity="false">
+            <appender-ref ref="druidSqlRollingFile"/>
+        </logger>
+
+    </Loggers>
+</Configuration>
